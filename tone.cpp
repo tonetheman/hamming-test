@@ -1,13 +1,52 @@
 #include <iostream>
 #include <cstring>
+#include <fstream>
+#include <iomanip>
+#include <vector>
+#include <string>
+#include <cstdlib>
 #include <polarssl/sha1.h>
 
 using namespace std;
+
+const int WORD_COUNT = 12;
+
+typedef vector<string> VS;
+
+VS load_file() {
+	ifstream inf;
+	inf.open("./words");
+	if (!inf) {
+		cout << "unable to open word list" << endl;
+		exit(1);
+	}
+	string buffer;
+	VS result;
+	while(inf >> buffer) {
+		result.push_back(buffer);
+	}
+	inf.close();
+	return result;
+}
+
+int make_rand() {
+	return rand() % 1000;
+}
+string get_random_word(VS& vs) {
+	return vs[make_rand()];
+}
 
 class SHA {
 	public:
 		unsigned char sha1sum[20];
 };
+
+ostream& operator<<(ostream& os, SHA& sha) {
+	for(int i=0;i<20;i++) {
+		os << hex << (int)sha.sha1sum[i];
+	}
+	return os;
+}
 
 SHA sha_it(const char * cp) {
 	sha1_context ctx;
@@ -68,7 +107,35 @@ void test() {
 	cout << "score: " << dec << score(sha,sha1) << endl;
 }
 
+void init() {
+	srand(0);
+}
+
+string make_target_string(VS& words) {
+	string ts;
+	for(int i=0;i<WORD_COUNT;i++) {
+		ts += get_random_word(words);
+		if (i==WORD_COUNT-1) {
+			// do nothing
+		} else {
+			ts += " ";
+		}	
+	}
+	return ts;
+}
+
+SHA make_target_sha(const string& s) {
+	return sha_it(s.c_str());
+}
+
 int main() {
-	test();
+	init();
+	VS words = load_file();
+	cout << "total number of words loaded: " << words.size() << endl;
+	string target = make_target_string(words);
+	cout << "target is set to: " << target << endl;
+	SHA target_sha = make_target_sha(target);
+	cout << "target sha is: " << target_sha << endl;
+	//test();
 	return 0;
 }
