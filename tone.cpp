@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include <polarssl/sha1.h>
 
 using namespace std;
