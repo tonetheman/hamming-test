@@ -11,7 +11,7 @@ unknown string.
 from hashlib import sha1
 import random
 import sys
-from multiprocessing import Process
+# from multiprocessing import Process
 
 # Number of concurrent processes to run
 NUM_CORES=2
@@ -109,13 +109,9 @@ def run_contest(id, wordfile, targetHexdigest):
 
 
 if __name__ == '__main__':
-    plist = []
-    for core in range(NUM_CORES):
-        p = Process( target=run_contest, args=[core, './words', 'd325e29428175a863b105555f086d0fd08bc5a27'])
-        plist.append(p)
+	import threading
+	t = threading.Thread(None, run_contest, "thread-1", (1, "./words", 'd325e29428175a863b105555f086d0fd08bc5a27'))
+	t.start()
 
-    for p in plist:
-        p.start()
-
-    plist[0].join()
-
+	t2 = threading.Thread(None, run_contest, "thread-2", (2, "./words", 'd325e29428175a863b105555f086d0fd08bc5a27'))
+	t2.start()
