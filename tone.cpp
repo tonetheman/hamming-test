@@ -10,8 +10,23 @@
 using namespace std;
 
 const int WORD_COUNT = 12;
+const int POPULATION_SIZE = 100;
 
 typedef vector<string> VS;
+
+int make_rand();
+
+// population lives here
+VS population[POPULATION_SIZE];
+
+void initialize_population(VS& words) {
+	for(int i=0;i<POPULATION_SIZE;i++) {
+		for(int j=0;j<WORD_COUNT;j++) {
+			int choice = make_rand();
+			population[i].push_back(words[choice]);
+		}	
+	}
+}
 
 VS load_file() {
 	ifstream inf;
@@ -128,10 +143,18 @@ SHA make_target_sha(const string& s) {
 	return sha_it(s.c_str());
 }
 
+void sim_loop() {
+}
+
 int main() {
 	init();
 	VS words = load_file();
 	cout << "total number of words loaded: " << words.size() << endl;
+	cout << "setting up random population..." << endl;
+	initialize_population(words);
+
+	sim_loop();
+
 	string target = make_target_string(words);
 	cout << "target is set to: " << target << endl;
 	SHA target_sha = make_target_sha(target);
