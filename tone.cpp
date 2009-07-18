@@ -10,9 +10,10 @@
 using namespace std;
 
 const int WORD_COUNT = 12;
-const int POPULATION_SIZE = 2;
+const int POPULATION_SIZE = 3;
 
 typedef vector<string> VS;
+typedef vector<int> VI;
 
 ostream& operator<<(ostream& os, VS& vs) {
 	VS::iterator ip = vs.begin();
@@ -37,7 +38,9 @@ struct SimData {
 	int step;
 	string target;
 	SHA target_sha;
+	VS words;
 	SimData() : step(0) {}
+
 };
 
 void initialize_population(VS& words) {
@@ -193,12 +196,40 @@ void report_score(int * pop_score) {
 	}
 }
 
+int find_low(int* pop_score) {
+	int index = -1;
+	int low_score = 10000;
+	for(int i=0;i<POPULATION_SIZE;i++) {
+		if (pop_score[i] < low_score) {
+			index = i;
+			low_score = pop_score[i];
+		}
+	}
+	return index;
+}
+
+void setup_new_population(SimData& sim) {
+}
+
+
 void sim_loop(SimData& sim) {
 	int pop_score[POPULATION_SIZE];
+	int lowest_score = 1024;
+	int count = 0;
+	initialize_population(sim.words);
+
 	while(true) {
+
 		score_population(sim, pop_score);
 		report_score(pop_score);
-		break;
+		cout << "---------------" << endl;
+		int new_low_index = find_low(pop_score);
+		cout << "LOWEST SCORE IS IN POSITION: " << new_low_index << endl;
+
+		setup_new_population(sim);
+
+		count++;
+		if (count>2) break;
 	}
 }
 
@@ -206,12 +237,11 @@ int main() {
 	init();
 	SimData sim;
 
-	VS words = load_file();
-	cout << "total number of words loaded: " << words.size() << endl;
+	sim.words = load_file();
+	cout << "total number of words loaded: " << sim.words.size() << endl;
 	cout << "setting up random population..." << endl;
-	initialize_population(words);
 
-	string target = make_target_string(words);
+	string target = make_target_string(sim.words);
 	cout << "target is set to: " << target << endl;
 	SHA target_sha = make_target_sha(target);
 	cout << "target sha is: " << target_sha << endl;
