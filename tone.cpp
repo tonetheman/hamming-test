@@ -10,14 +10,35 @@
 using namespace std;
 
 const int WORD_COUNT = 12;
-const int POPULATION_SIZE = 100;
+const int POPULATION_SIZE = 2;
 
 typedef vector<string> VS;
+
+ostream& operator<<(ostream& os, VS& vs) {
+	VS::iterator ip = vs.begin();
+	while(ip!=vs.end()) {
+		os << *ip++ << " ";
+	}
+	return os;
+}
 
 int make_rand();
 
 // population lives here
 VS population[POPULATION_SIZE];
+
+class SHA {
+	public:
+		unsigned char sha1sum[20];
+};
+
+
+struct SimData {
+	int step;
+	string target;
+	SHA target_sha;
+	SimData() : step(0) {}
+};
 
 void initialize_population(VS& words) {
 	for(int i=0;i<POPULATION_SIZE;i++) {
@@ -50,11 +71,6 @@ int make_rand() {
 string get_random_word(VS& vs) {
 	return vs[make_rand()];
 }
-
-class SHA {
-	public:
-		unsigned char sha1sum[20];
-};
 
 ostream& operator<<(ostream& os, SHA& sha) {
 	for(int i=0;i<20;i++) {
@@ -143,22 +159,61 @@ SHA make_target_sha(const string& s) {
 	return sha_it(s.c_str());
 }
 
-void sim_loop() {
+// assumes buffer is 1024 chars
+void make_string(VS words, char * buffer) {
+	int cp=0;
+	
+	for(int i=0;i<WORD_COUNT;i++) {
+		strcpy(buffer+cp,words[i].c_str());
+		cp += strlen(words[i].c_str());
+		if (i<WORD_COUNT-1) {
+			cp++;
+			*(buffer+cp) = ' ';
+			cp++;
+		}
+	}
+}
+
+void score_population(SimData& sim, int * pop_score) {
+	char buffer[1024]; // big enough to hold 12 words
+
+	cout << "DBG: population[0]: " << population[0] << endl;
+	
+	for(int i=0;i<POPULATION_SIZE;i++) {
+		memset(buffer,'\0',1024);
+		make_string(population[i], buffer);
+		cout << "dbg: string is " << buffer << "****" << endl;
+		SHA tmp_sha = sha_it(buffer);
+		int tmp_sha_score = score(tmp_sha, sim.target_sha);
+	}
+}
+
+void sim_loop(SimData& sim) {
+	int pop_score[POPULATION_SIZE];
+	while(true) {
+		score_population(sim, pop_score);
+		break;
+	}
 }
 
 int main() {
 	init();
+	SimData sim;
+
 	VS words = load_file();
 	cout << "total number of words loaded: " << words.size() << endl;
 	cout << "setting up random population..." << endl;
 	initialize_population(words);
-
-	sim_loop();
 
 	string target = make_target_string(words);
 	cout << "target is set to: " << target << endl;
 	SHA target_sha = make_target_sha(target);
 	cout << "target sha is: " << target_sha << endl;
 	//test();
+	sim.target = target;
+	sim.target_sha = target_sha;
+
+	sim_loop(sim);
+
 	return 0;
 }
