@@ -166,11 +166,10 @@ void make_string(VS words, char * buffer) {
 	for(int i=0;i<WORD_COUNT;i++) {
 		strcpy(buffer+cp,words[i].c_str());
 		cp += strlen(words[i].c_str());
-		if (i<WORD_COUNT-1) {
-			cp++;
+		if (i!=WORD_COUNT-1) {
 			*(buffer+cp) = ' ';
-			cp++;
 		}
+		cp++;
 	}
 }
 
@@ -182,9 +181,15 @@ void score_population(SimData& sim, int * pop_score) {
 	for(int i=0;i<POPULATION_SIZE;i++) {
 		memset(buffer,'\0',1024);
 		make_string(population[i], buffer);
-		cout << "dbg: string is " << buffer << "****" << endl;
 		SHA tmp_sha = sha_it(buffer);
 		int tmp_sha_score = score(tmp_sha, sim.target_sha);
+		pop_score[i] = tmp_sha_score;
+	}
+}
+
+void report_score(int * pop_score) {
+	for(int i=0;i<POPULATION_SIZE;i++) {
+		cout << "score: " << dec << i << " " << pop_score[i] << endl;
 	}
 }
 
@@ -192,6 +197,7 @@ void sim_loop(SimData& sim) {
 	int pop_score[POPULATION_SIZE];
 	while(true) {
 		score_population(sim, pop_score);
+		report_score(pop_score);
 		break;
 	}
 }
@@ -209,7 +215,6 @@ int main() {
 	cout << "target is set to: " << target << endl;
 	SHA target_sha = make_target_sha(target);
 	cout << "target sha is: " << target_sha << endl;
-	//test();
 	sim.target = target;
 	sim.target_sha = target_sha;
 
