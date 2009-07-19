@@ -269,19 +269,6 @@ ostream& operator<<(ostream& os, SHA& sha) {
 	return os;
 }
 
-void test() {
-	const char * cp = "Rubinius one eight six active active record memcached exception JRuby DHH TOKYO sdfe3";
-	SHA sha = SHA::sha_it(cp);
-	cout << sha << endl;
-
-	const char * cp1 = "I am not a big believer in fortune telling";
-	SHA sha1 = SHA::sha_it(cp1);
-	cout << sha1 << endl;
-
-	// hamming testing
-	cout << "score: " << dec << SHA::score(sha,sha1) << endl;
-}
-
 void init() {
 	srand(0);
 }
