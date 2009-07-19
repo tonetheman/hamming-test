@@ -33,12 +33,16 @@ class SHA {
 		unsigned char sha1sum[20];
 };
 
-
 struct SimData {
 	int step;
 	string target;
 	SHA target_sha;
 	VS words;
+
+	int current_low_index;
+	VS current_low;
+	int current_low_score;
+
 	SimData() : step(0) {}
 
 };
@@ -209,6 +213,12 @@ int find_low(int* pop_score) {
 }
 
 void setup_new_population(SimData& sim) {
+	VS good_stuff = population[sim.current_low_index];
+
+	for(int i=0;i<POPULATION_SIZE;i++) {
+		population[i].clear();	
+	}
+	initialize_population(sim.words);
 }
 
 
@@ -219,18 +229,23 @@ void sim_loop(SimData& sim) {
 	initialize_population(sim.words);
 
 	while(true) {
-
+		cout << "scoring current population" << endl;
 		score_population(sim, pop_score);
+		cout << "reporing score" << endl;
 		report_score(pop_score);
 		cout << "---------------" << endl;
 		int new_low_index = find_low(pop_score);
-		cout << "LOWEST SCORE IS IN POSITION: " << new_low_index << endl;
 
+		sim.current_low_index = new_low_index;
+		sim.current_low = population[sim.current_low_index];
+		
 		setup_new_population(sim);
 
 		count++;
-		if (count>2) break;
+		if (count>200) break;
 	}
+
+	cout << "final low is " << sim.current_low << endl;
 }
 
 int main() {
