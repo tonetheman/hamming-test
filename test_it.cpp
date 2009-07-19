@@ -69,8 +69,10 @@ struct SHA {
 };
 
 ostream& operator<<(ostream& os, SHA& sha) {
+	char buffer[4];
 	for(int i=0;i<20;i++) {
-		os << hex << (int)sha.sha1sum[i];
+		sprintf(buffer,"%02x",(int)sha.sha1sum[i]);
+		os << buffer;
 	}
 	return os;
 }
@@ -88,9 +90,22 @@ void test() {
 	cout << "score: " << dec << SHA::score(sha,sha1) << endl;
 }
 
+void test2() {
+	const char * cp = "What you write today will become legacy";
+	SHA sha = SHA::sha_it(cp);
+	cout << sha << endl;
+	const char * cp2 = "RuBy one eight six rspec mongrel MRI jruby jruby memcached exception reflection utf8E";
+	SHA sha2 = SHA::sha_it(cp2);
+	cout << sha2 << endl;
+
+	int score = SHA::score(sha,sha2);
+	cout << "score is " << score << endl;
+}
+
 int main() {
 
 	test();
+	test2();
 
 	return 0;
 }

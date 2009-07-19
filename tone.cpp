@@ -263,8 +263,10 @@ struct SimData {
 };
 
 ostream& operator<<(ostream& os, SHA& sha) {
+	char buffer[4];
 	for(int i=0;i<20;i++) {
-		os << hex << (int)sha.sha1sum[i];
+		sprintf(buffer, "%02x", (int)sha.sha1sum[i]);
+		os << buffer;
 	}
 	return os;
 }
