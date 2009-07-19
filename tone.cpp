@@ -16,6 +16,51 @@ const int CUTOFF = 2;
 typedef vector<string> VS;
 typedef vector<int> VI;
 
+
+struct SHA {
+	public:
+		unsigned char sha1sum[20];
+
+	static SHA sha_it(const char * cp) {
+		sha1_context ctx;
+		sha1_starts(&ctx);
+		sha1_update(&ctx,(unsigned char*)cp, strlen(cp));
+		SHA s;
+		sha1_finish(&ctx, s.sha1sum);
+		return s;
+	}
+
+	static int __score(unsigned char c) {
+		int sum = 0;
+	        switch(c) {
+        		case 0x1:
+                	case 0x2: case 0x4: case 0x8:
+	                	sum +=1; break;
+        	        case 0x3: case 0x5: case 0x6: case 0x9:
+                	case 10: case 12: 
+	                        sum +=2; break;
+        	        case 0x7: case 14: case 13: case 11:
+	                        sum += 3; break;
+        	        case 15:
+	                        sum +=4; break;
+        	        }
+		return sum;
+	}	
+
+	static int score(SHA s1, SHA s2) {
+		SHA result;
+		int sum = 0;
+		for(int i=0;i<20;i++ ) {
+			result.sha1sum[i] = s1.sha1sum[i] ^ s2.sha1sum[i];
+			unsigned char part1 = result.sha1sum[i] >> 4;
+			unsigned char part2 = (unsigned char)(result.sha1sum[i] & 0x0f);
+			sum += __score(part1);
+			sum += __score(part2);
+		}
+		return sum;
+	}	
+};
+
 ostream& operator<<(ostream& os, VS& vs) {
 	VS::iterator ip = vs.begin();
 	while(ip!=vs.end()) {
@@ -26,19 +71,101 @@ ostream& operator<<(ostream& os, VS& vs) {
 
 int make_rand();
 
-// population lives here
-VS population[POPULATION_SIZE];
+struct Population {
+	VS population[POPULATION_SIZE];
 
-class SHA {
-	public:
-		unsigned char sha1sum[20];
+	void init(VS& words) {
+		for(int i=0;i<POPULATION_SIZE;i++) {
+			for(int j=0;j<WORD_COUNT;j++) {
+				int choice = make_rand();
+				population[i].push_back(words[choice]);
+			}	
+		}
+	}
+
+	VS get(int i) {
+		return population[i];
+	}
+
+	void make_string(VS words, char * buffer) {
+		int cp=0;
+		
+		for(int i=0;i<WORD_COUNT;i++) {
+			strcpy(buffer+cp,words[i].c_str());
+			cp += strlen(words[i].c_str());
+			if (i!=WORD_COUNT-1) {
+				*(buffer+cp) = ' ';
+			}
+			cp++;
+		}
+	}
+
+//	void score_population(SimData& sim, int * pop_score) {
+	void score_population(SHA target_sha, int * pop_score) {
+		char buffer[1024]; // big enough to hold 12 words
+
+	
+		for(int i=0;i<POPULATION_SIZE;i++) {
+			memset(buffer,'\0',1024);
+			make_string(population[i], buffer);
+			SHA tmp_sha = SHA::sha_it(buffer);
+			int tmp_sha_score = SHA::score(tmp_sha, target_sha);
+			pop_score[i] = tmp_sha_score;
+		}
+	}
+};
+
+struct Words {
+	VS words;
+	void init() {
+		words = load_file();
+	}
+	int size() {
+		return words.size();
+	}
+	VS load_file() {
+		ifstream inf;
+		inf.open("./words");
+		if (!inf) {
+			cout << "unable to open word list" << endl;
+			exit(1);
+		}
+		string buffer;
+		VS result;
+		while(inf >> buffer) {
+			result.push_back(buffer);
+		}
+		inf.close();
+		return result;
+	}
+
+	string get_random_word(VS& vs) {
+		return vs[make_rand()];
+	}
+
+	string make_target_string(VS& words) {
+		string ts;
+		for(int i=0;i<WORD_COUNT;i++) {
+			ts += get_random_word(words);
+			if (i==WORD_COUNT-1) {
+				// do nothing
+			} else {
+				ts += " ";
+			}	
+		}
+		return ts;
+	}
+
+	SHA make_target_sha(const string& s) {
+		return SHA::sha_it(s.c_str());
+	}
 };
 
 struct SimData {
 	int step;
 	string target;
 	SHA target_sha;
-	VS words;
+	Words words;
 
 	int current_low_index;
 	VS current_low;
@@ -46,38 +173,13 @@ struct SimData {
 
 	SimData() : step(0) {}
 
+	void load_data() {
+		words.load_file();
+	}
 };
-
-void initialize_population(VS& words) {
-	for(int i=0;i<POPULATION_SIZE;i++) {
-		for(int j=0;j<WORD_COUNT;j++) {
-			int choice = make_rand();
-			population[i].push_back(words[choice]);
-		}	
-	}
-}
-
-VS load_file() {
-	ifstream inf;
-	inf.open("./words");
-	if (!inf) {
-		cout << "unable to open word list" << endl;
-		exit(1);
-	}
-	string buffer;
-	VS result;
-	while(inf >> buffer) {
-		result.push_back(buffer);
-	}
-	inf.close();
-	return result;
-}
 
 int make_rand() {
 	return rand() % 1000;
-}
-string get_random_word(VS& vs) {
-	return vs[make_rand()];
 }
 
 ostream& operator<<(ostream& os, SHA& sha) {
@@ -150,24 +252,6 @@ void init() {
 	srand(0);
 }
 
-string make_target_string(VS& words) {
-	string ts;
-	for(int i=0;i<WORD_COUNT;i++) {
-		ts += get_random_word(words);
-		if (i==WORD_COUNT-1) {
-			// do nothing
-		} else {
-			ts += " ";
-		}	
-	}
-	return ts;
-}
-
-SHA make_target_sha(const string& s) {
-	return sha_it(s.c_str());
-}
-
-// assumes buffer is 1024 chars
 void make_string(VS words, char * buffer) {
 	int cp=0;
 	
@@ -178,20 +262,6 @@ void make_string(VS words, char * buffer) {
 			*(buffer+cp) = ' ';
 		}
 		cp++;
-	}
-}
-
-void score_population(SimData& sim, int * pop_score) {
-	char buffer[1024]; // big enough to hold 12 words
-
-	//cout << "DBG: population[0]: " << population[0] << endl;
-	
-	for(int i=0;i<POPULATION_SIZE;i++) {
-		memset(buffer,'\0',1024);
-		make_string(population[i], buffer);
-		SHA tmp_sha = sha_it(buffer);
-		int tmp_sha_score = score(tmp_sha, sim.target_sha);
-		pop_score[i] = tmp_sha_score;
 	}
 }
 
@@ -270,8 +340,8 @@ void sim_loop(SimData& sim) {
 int main() {
 	init();
 	SimData sim;
+	sim.load_data();
 
-	sim.words = load_file();
 	cout << "total number of words loaded: " << sim.words.size() << endl;
 	cout << "setting up random population..." << endl;
 
