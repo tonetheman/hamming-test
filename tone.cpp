@@ -11,6 +11,7 @@ using namespace std;
 
 const int WORD_COUNT = 12;
 const int POPULATION_SIZE = 3;
+const int CUTOFF = 2;
 
 typedef vector<string> VS;
 typedef vector<int> VI;
@@ -183,7 +184,7 @@ void make_string(VS words, char * buffer) {
 void score_population(SimData& sim, int * pop_score) {
 	char buffer[1024]; // big enough to hold 12 words
 
-	cout << "DBG: population[0]: " << population[0] << endl;
+	//cout << "DBG: population[0]: " << population[0] << endl;
 	
 	for(int i=0;i<POPULATION_SIZE;i++) {
 		memset(buffer,'\0',1024);
@@ -221,6 +222,18 @@ void setup_new_population(SimData& sim) {
 	initialize_population(sim.words);
 }
 
+void write_current_low(SimData& sim) {
+	ofstream outf;
+	outf.open("./results", ios::app);
+	VS::iterator it = sim.current_low.begin();
+	while(it!=sim.current_low.end()) {
+		outf << *it;
+		it++;
+	}
+	outf << endl;
+	outf << "low score: " << sim.current_low_score << endl;	
+	outf.close();
+}
 
 void sim_loop(SimData& sim) {
 	int pop_score[POPULATION_SIZE];
@@ -229,23 +242,29 @@ void sim_loop(SimData& sim) {
 	initialize_population(sim.words);
 
 	while(true) {
-		cout << "scoring current population" << endl;
+		//cout << "scoring current population" << endl;
 		score_population(sim, pop_score);
-		cout << "reporing score" << endl;
-		report_score(pop_score);
-		cout << "---------------" << endl;
+		//cout << "reporing score" << endl;
+		//report_score(pop_score);
+		//cout << "---------------" << endl;
 		int new_low_index = find_low(pop_score);
 
-		sim.current_low_index = new_low_index;
-		sim.current_low = population[sim.current_low_index];
-		
+		if (new_low_index<lowest_score) {
+			lowest_score = pop_score[sim.current_low_index];
+			sim.current_low_index = new_low_index;
+			sim.current_low = population[sim.current_low_index];
+			sim.current_low_score = pop_score[sim.current_low_index];
+			write_current_low(sim);
+		}
+
 		setup_new_population(sim);
 
 		count++;
-		if (count>200) break;
+		if (count>CUTOFF) break;
 	}
 
 	cout << "final low is " << sim.current_low << endl;
+	cout << "score for final low is " << sim.current_low_score << endl;
 }
 
 int main() {
