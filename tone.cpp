@@ -16,11 +16,13 @@ const int CUTOFF = 2;
 typedef vector<string> VS;
 typedef vector<int> VI;
 
+void dbg(string s) {
+	cout << "dbg: " << s << endl;
+}
+
 int make_rand() {
 	return rand() % 1000;
 }
-
-
 
 struct SHA {
 	public:
@@ -95,6 +97,7 @@ struct Words {
 	}
 
 	string make_target_string() {
+		dbg("enter make_target_string");
 		string ts;
 		for(int i=0;i<WORD_COUNT;i++) {
 			ts += get_random_word();
@@ -152,7 +155,6 @@ struct Population {
 		}
 	}
 
-//	void score_population(SimData& sim, int * pop_score) {
 	void score_population(SHA target_sha, int * pop_score) {
 		char buffer[1024]; // big enough to hold 12 words
 
@@ -187,11 +189,17 @@ struct SimData {
 
 	SimData() : step(0) {}
 
+	void init() {
+		words.init();
+	}
+
 	void load_data() {
 		words.load_file();
 	}
 	string make_target_string() {
+		dbg("SimData: enter make_target_string");
 		target = words.make_target_string();
+		dbg("SimData: exit make_target_string");
 		return target;
 	}
 	SHA make_target_sha() {
@@ -215,7 +223,9 @@ struct SimData {
 		int pop_score[POPULATION_SIZE];
 		int lowest_score = 1024;
 		int count = 0;
+		dbg("before population init");
 		population.init(words);
+		dbg("after population init call");
 
 		while(true) {
 			population.score_population(target_sha, pop_score);
@@ -299,15 +309,21 @@ void report_score(int * pop_score) {
 
 int main() {
 	init();
+
+	dbg("create sim");
 	SimData sim;
+	sim.init();
 	sim.load_data();
+	dbg("after load data");
 
 	string target = sim.make_target_string();
-	cout << "target is set to: " << target << endl;
+	dbg("after make target string");
+
 	SHA target_sha = sim.make_target_sha();
-	cout << "target sha is: " << target_sha << endl;
-	
+	dbg("after target sha make");
+
 	sim.sim_loop();
+	dbg("after sim loop");
 
 	return 0;
 }
