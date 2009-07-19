@@ -11,7 +11,7 @@ using namespace std;
 
 const int WORD_COUNT = 12;
 const int POPULATION_SIZE = 3;
-const int CUTOFF = 200;
+const int CUTOFF = 200000;
 
 typedef vector<string> VS;
 typedef vector<int> VI;
@@ -165,8 +165,6 @@ struct Population {
 			SHA tmp_sha = SHA::sha_it(buffer);
 			int tmp_sha_score = SHA::score(tmp_sha, target_sha);
 			pop_score[i] = tmp_sha_score;
-			cout <<
-				"\tscore_population: " << i << " : " << pop_score[i] << endl;
 		}
 	}
 
@@ -228,19 +226,16 @@ struct SimData {
 		population.init(words);
 
 		while(true) {
-			cout << "dbg: top of while lowest score is: " << lowest_score
-				 << endl;
+
 			population.score_population(target_sha, pop_score);
 			int new_low_index = find_low(pop_score);
-			cout << "dbg:\tin loop new low index is: " << new_low_index
-				<< endl;
 			int new_low_score = pop_score[new_low_index];
 
 			if (new_low_score<lowest_score) {
-				lowest_score = pop_score[current_low_index];
+				lowest_score = new_low_score;
 				this->current_low_index = new_low_index;
-				this->current_low = population.get(current_low_index);
-				this->current_low_score = pop_score[current_low_index];
+				this->current_low = population.get(new_low_index);
+				this->current_low_score = new_low_score;
 				write_current_low();
 			}
 
@@ -257,7 +252,7 @@ struct SimData {
 		outf.open("./results", ios::app);
 		VS::iterator it = current_low.begin();
 		while(it!=current_low.end()) {
-			outf << *it;
+			outf << *it << " ";
 			it++;
 		}
 		outf << endl;
