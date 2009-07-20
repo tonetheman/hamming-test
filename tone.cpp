@@ -177,6 +177,11 @@ struct Population {
 
 };
 
+struct LowInformation {
+	string lowstring;
+	int lowscore;
+};
+
 struct SimData {
 	int step;
 	string target;
@@ -237,14 +242,16 @@ struct SimData {
 	}
 
 
-	void load_saved_low_from_file(string savedlow_filename) {
+	LowInformation load_saved_low_from_file(string savedlow_filename) {
 		ifstream inf;
 		inf.open("./savedlow");
-		string lowstring;
-		inf >> lowstring;
-		int lowscore;
-		inf >> lowscore;
+		LowInformation l;
+		char buffer[1024];
+		inf.getline(buffer,1024);
+		l.lowstring = buffer;
+		inf >> l.lowscore;
 		inf.close();
+		return l;
 	}
 
 	void sim_loop() {
