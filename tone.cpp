@@ -205,8 +205,10 @@ struct SimData {
 			cout << "unable to open target" << endl;
 			exit(1);
 		}
+		char cbuffer[1024];
+		inf.getline(cbuffer,1024);
 		string buffer;
-		inf >> buffer;
+		buffer = cbuffer;
 		inf.close();
 		target = buffer;
 		return buffer;
@@ -234,6 +236,16 @@ struct SimData {
 		return index;
 	}
 
+
+	void load_saved_low_from_file(string savedlow_filename) {
+		ifstream inf;
+		inf.open("./savedlow");
+		string lowstring;
+		inf >> lowstring;
+		int lowscore;
+		inf >> lowscore;
+		inf.close();
+	}
 
 	void sim_loop() {
 		int pop_score[POPULATION_SIZE];
