@@ -1,5 +1,8 @@
 
-all: tone test_it
+all: tone test_it junk
+
+junk : junk.cpp
+	g++ -g -o junk junk.cpp
 
 test_it : test_it.cpp
 	g++ -g -o test_it test_it.cpp -I polarssl-0.11.1/include \
