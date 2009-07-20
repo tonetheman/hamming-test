@@ -70,15 +70,16 @@ struct SHA {
 
 struct Words {
 	VS words;
-	void init() {
-		words = load_file();
+	void init(string words_filename) {
+		words = load_file(words_filename);
 	}
 	int size() {
 		return words.size();
 	}
-	VS load_file() {
+	VS load_file(string words_filename) {
 		ifstream inf;
-		inf.open("./words");
+		//inf.open("./words");
+		inf.open(words_filename.c_str());
 		if (!inf) {
 			cout << "unable to open word list" << endl;
 			exit(1);
@@ -189,13 +190,17 @@ struct SimData {
 
 	SimData() : step(0) {}
 
-	void init() {
-		words.init();
+	void init(string words_filename) {
+		words.init(words_filename);
 	}
 
-	void load_data() {
-		words.load_file();
+	void load_data(string words_filename) {
+		words.load_file(words_filename);
 	}
+
+	string set_target_string(string target_filename) {
+	}
+
 	string make_target_string() {
 		dbg("SimData: enter make_target_string");
 		target = words.make_target_string();
@@ -295,15 +300,34 @@ void report_score(int * pop_score) {
 }
 
 int main(int argc, char* argv[]) {
+
+	if (argc!=5) {
+		cout << "unable to parse args" << endl;
+		cout << "tone -t target_file -w word_file" << endl;
+		return -1;
+	}
+
+	string target_filename;
+	string words_filename;
+	for(int i=1;i<argc;i++) {
+		if (strcmp("-t",argv[i])==0) {
+			target_filename = argv[++i];
+		}
+		if (strcmp("-w",argv[i])==0) {
+			words_filename = argv[++i];
+		}
+	}
+
 	init();
 
 	dbg("create sim");
 	SimData sim;
-	sim.init();
-	sim.load_data();
+	sim.init(words_filename);
+	sim.load_data(words_filename);
 	dbg("after load data");
 
-	string target = sim.make_target_string();
+	string target = sim.set_target_string(target_filename);
+	//string target = sim.make_target_string();
 	dbg("after make target string");
 
 	SHA target_sha = sim.make_target_sha();
