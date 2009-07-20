@@ -11,7 +11,7 @@ using namespace std;
 
 const int WORD_COUNT = 12;
 const int POPULATION_SIZE = 3;
-const int CUTOFF = 200000;
+const int CUTOFF = 2000000;
 
 typedef vector<string> VS;
 typedef vector<int> VI;
@@ -199,6 +199,17 @@ struct SimData {
 	}
 
 	string set_target_string(string target_filename) {
+		ifstream inf;
+		inf.open(target_filename.c_str());
+		if (!inf) {
+			cout << "unable to open target" << endl;
+			exit(1);
+		}
+		string buffer;
+		inf >> buffer;
+		inf.close();
+		target = buffer;
+		return buffer;
 	}
 
 	string make_target_string() {
@@ -277,7 +288,7 @@ ostream& operator<<(ostream& os, SHA& sha) {
 }
 
 void init() {
-	srand(0);
+	srand(time(0));
 }
 
 void make_string(VS words, char * buffer) {
