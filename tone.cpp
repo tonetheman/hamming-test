@@ -11,7 +11,7 @@ using namespace std;
 
 const int WORD_COUNT = 12;
 const int POPULATION_SIZE = 3;
-const int CUTOFF = 2000000;
+const int CUTOFF = 1000000;
 
 typedef vector<string> VS;
 typedef vector<int> VI;
@@ -256,7 +256,12 @@ struct SimData {
 
 	void sim_loop() {
 		int pop_score[POPULATION_SIZE];
-		int lowest_score = 1024;
+		LowInformation l = load_saved_low_from_file("./savedlow");
+
+		int lowest_score = l.lowscore;
+		if (lowest_score<0) {
+			lowest_score = 1024;
+		}
 		int count = 0;
 		population.init(words);
 
@@ -291,7 +296,7 @@ struct SimData {
 			it++;
 		}
 		outf << endl;
-		outf << "low score: " << current_low_score << endl;	
+		outf << current_low_score << endl;	
 		outf.close();
 	}
 
