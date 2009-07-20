@@ -1,4 +1,4 @@
 #!/bin/bash
 
 rm -rf results
-./tone
+./tone -t target -w words
