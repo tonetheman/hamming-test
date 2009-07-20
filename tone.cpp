@@ -98,7 +98,7 @@ struct Words {
 	}
 
 	string make_target_string() {
-		dbg("enter make_target_string");
+		//dbg("enter make_target_string");
 		string ts;
 		for(int i=0;i<WORD_COUNT;i++) {
 			ts += get_random_word();
@@ -220,9 +220,9 @@ struct SimData {
 	}
 
 	string make_target_string() {
-		dbg("SimData: enter make_target_string");
+		//dbg("SimData: enter make_target_string");
 		target = words.make_target_string();
-		dbg("SimData: exit make_target_string");
+		//dbg("SimData: exit make_target_string");
 		return target;
 	}
 	SHA make_target_sha() {
@@ -342,6 +342,8 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 
+	cout << "tone - engine yard solver - copyright 2009, tony colston" << endl;
+
 	string target_filename;
 	string words_filename;
 	for(int i=1;i<argc;i++) {
@@ -355,21 +357,21 @@ int main(int argc, char* argv[]) {
 
 	init();
 
-	dbg("create sim");
+	//dbg("create sim");
 	SimData sim;
 	sim.init(words_filename);
 	sim.load_data(words_filename);
-	dbg("after load data");
+	//dbg("after load data");
 
 	string target = sim.set_target_string(target_filename);
 	//string target = sim.make_target_string();
-	dbg("after make target string");
+	//dbg("after make target string");
 
 	SHA target_sha = sim.make_target_sha();
-	dbg("after target sha make");
+	//dbg("after target sha make");
 
 	sim.sim_loop();
-	dbg("after sim loop");
+	//dbg("after sim loop");
 
 	return 0;
 }
