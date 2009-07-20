@@ -294,7 +294,7 @@ void report_score(int * pop_score) {
 	}
 }
 
-int main() {
+int main(int argc, char* argv[]) {
 	init();
 
 	dbg("create sim");
