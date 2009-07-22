@@ -11,7 +11,7 @@ while [[ true ]]; do
 		tail -2 ./results > ./savedlow
 	fi
 	COUNT=`./addr.py 1 $COUNT`
-	if [[ $COUNT -eq 2 ]]; then
+	if [[ $COUNT -eq 1 ]]; then
 		break
 	fi
 done
