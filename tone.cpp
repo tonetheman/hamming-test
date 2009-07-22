@@ -5,13 +5,14 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
+#include <algorithm>
 #include <polarssl/sha1.h>
 
 using namespace std;
 
 const int WORD_COUNT = 12;
 const int POPULATION_SIZE = 3;
-const int CUTOFF = 1000000;
+const int CUTOFF = 10000000;
 
 typedef vector<string> VS;
 typedef vector<int> VI;
@@ -21,7 +22,7 @@ void dbg(string s) {
 }
 
 int make_rand() {
-	return rand() % 1000;
+	return abs(rand()) % 1000;
 }
 
 struct SHA {
@@ -98,7 +99,6 @@ struct Words {
 	}
 
 	string make_target_string() {
-		//dbg("enter make_target_string");
 		string ts;
 		for(int i=0;i<WORD_COUNT;i++) {
 			ts += get_random_word();
@@ -134,7 +134,17 @@ struct Population {
 		for(int i=0;i<POPULATION_SIZE;i++) {
 			for(int j=0;j<WORD_COUNT;j++) {
 				int choice = make_rand();
-				population[i].push_back(words.get(choice));
+				if (abs((rand()%10))<5) {
+					population[i].push_back(words.get(choice));
+				} else {
+					string s = words.get(choice);
+					char buffer[s.size()+1];
+					strcpy(buffer,s.c_str());
+					int r = rand() % s.size();
+					buffer[r] = toupper(buffer[r]);
+					string ss = buffer;
+					population[i].push_back(ss);
+				}
 			}	
 		}
 	}
@@ -271,6 +281,12 @@ struct SimData {
 			int new_low_index = find_low(pop_score);
 			int new_low_score = pop_score[new_low_index];
 
+			if (new_low_score<48) {
+				cout << "dbg: " << new_low_score << " ";
+				VS vs = population.get(new_low_index);
+				cout << vs << endl;
+			}
+
 			if (new_low_score<lowest_score) {
 				lowest_score = new_low_score;
 				this->current_low_index = new_low_index;
@@ -285,6 +301,8 @@ struct SimData {
 			count++;
 			if (count>CUTOFF) break;
 		}
+
+		cout << "dbg: low for this run: " << lowest_score << endl;
 	}
 
 	void write_current_low() {
