@@ -14,7 +14,8 @@ test_it : test_it.cpp
 	g++ -g -o test_it test_it.cpp ${INC} ${LIB}
 
 tone: tone.cpp
-	g++ -g -o tone tone.cpp ${INC} ${LIB}
+	g++ -g  -o tone tone.cpp ${INC} ${LIB}
+	# g++ -g -pg -o tone tone.cpp ${INC} ${LIB}
 
 clean:
 	rm -rf tone
