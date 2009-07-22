@@ -12,7 +12,7 @@ using namespace std;
 
 const int WORD_COUNT = 12;
 const int POPULATION_SIZE = 3;
-const int CUTOFF = 500000;
+const int CUTOFF = 1000000;
 
 typedef vector<string> VS;
 typedef vector<int> VI;
