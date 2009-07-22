@@ -12,7 +12,7 @@ using namespace std;
 
 const int WORD_COUNT = 12;
 const int POPULATION_SIZE = 3;
-const int CUTOFF = 10000000;
+const int CUTOFF = 500000;
 
 typedef vector<string> VS;
 typedef vector<int> VI;
@@ -274,7 +274,8 @@ struct SimData {
 		}
 		int count = 0;
 		population.init(words);
-
+		
+		time_t start_time = time(0);
 		while(true) {
 
 			population.score_population(target_sha, pop_score);
@@ -301,7 +302,8 @@ struct SimData {
 			count++;
 			if (count>CUTOFF) break;
 		}
-
+		time_t stop_time = time(0);
+		cout << "time to complete: " << (stop_time-start_time) << endl;
 		cout << "dbg: low for this run: " << lowest_score << endl;
 	}
 
