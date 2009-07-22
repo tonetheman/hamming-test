@@ -1,3 +1,5 @@
 
+07-21-2009 8:19 pm: speed right now is 31250
+
 here is the paste that has an example that should work
 http://fpaste.org/paste/18766
