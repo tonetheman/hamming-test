@@ -1,6 +1,8 @@
 
-07-21-2009 8:50 pm: speedtest, raw sha 1428571 per second
-07-21-2009 8:19 pm: speed right now is 31250
+07-21-2009 10:42 pm: 17543 trans persecond desktop
+07-21-2009 10:36 pm: speedtest, raw sha 909090 per second tone desktop
+07-21-2009 8:50 pm: speedtest, raw sha 1428571 per second (tone laptop)
+07-21-2009 8:19 pm: speed right now is 31250 (trans per second)
 
 here is the paste that has an example that should work
 http://fpaste.org/paste/18766
