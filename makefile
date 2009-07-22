@@ -15,3 +15,9 @@ test_it : test_it.cpp
 
 tone: tone.cpp
 	g++ -g -o tone tone.cpp ${INC} ${LIB}
+
+clean:
+	rm -rf tone
+	rm -rf test_it
+	rm -rf junk
+	rm -rf speedtest
