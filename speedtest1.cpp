@@ -175,11 +175,12 @@ int main(int argc, char* argv[]) {
 	words.init("words");
 
 	HashWordListTuple target = words.choose();
+	int THRESHOLD = 50;
 
-	for(int i=0;i<1000000;i++) {
+	for(int i=0;i<10000000;i++) {
 		HashWordListTuple ht =words.choose();
 		int scr = score(target,ht);
-		if (scr<45) {
+		if (scr<THRESHOLD) {
 			cout << scr << endl;
 		}
 	}
