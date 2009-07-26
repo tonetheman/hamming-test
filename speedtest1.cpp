@@ -21,6 +21,30 @@ int make_rand() {
 	return abs(rand()) % 1000;
 }
 
+struct WordIndexList {
+	int wl[WORD_COUNT];
+	void init() {
+		for(int i=0;i<WORD_COUNT;i++) wl[i] = make_rand();
+	}
+	void copy(WordIndexList& src) {
+		for(int i=0;i<WORD_COUNT;i++) wl[i] = src.wl[i];
+	}
+};
+
+struct HashWordListTuple {
+	WordIndexList wl;
+	unsigned char sha1[20];
+};
+
+ostream& operator<<(ostream& os, HashWordListTuple& src) {
+	for(int i=0;i<20;i++) {
+		char buffer[10];
+		sprintf(buffer, "%02x", src.sha1[i]);
+		os << buffer;
+	}
+	return os;
+}
+
 struct Words {
 	VS words;
 	void init(string words_filename) {
@@ -48,6 +72,23 @@ struct Words {
 
 	string get_random_word() {
 		return words[make_rand()];
+	}
+
+	HashWordListTuple choose() {
+		char SPACE[2]; SPACE[0] = ' '; SPACE[1] = 0;
+		HashWordListTuple ht;
+		ht.wl.init(); // this makes a random choice from all words
+		sha1_context ctx;
+		sha1_starts(&ctx);
+		for(int i=0;i<WORD_COUNT;i++) {
+			const char * cp = words[ht.wl.wl[i]].c_str(); // not safe really
+			sha1_update(&ctx,(unsigned char*)cp,strlen(cp));
+			if (i!=WORD_COUNT-1) { 
+				sha1_update(&ctx, (unsigned char*)SPACE,1);
+			}
+		}
+		sha1_finish(&ctx,ht.sha1);
+		return ht;
 	}
 
 	string make_target_string() {
@@ -97,6 +138,12 @@ int main(int argc, char* argv[]) {
 
 	Words words;
 	words.init("words");
+
+	for(int i=0;i<1000000;i++) {
+		//HashWordListTuple ht =words.choose();
+		//cout << ht << endl;
+		string s = words.make_target_string();
+	}
 
 	return 0;
 }
