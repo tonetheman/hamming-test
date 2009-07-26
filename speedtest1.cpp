@@ -121,6 +121,41 @@ void init() {
 	srand(time(0));
 }
 
+
+static int __score(unsigned char c) {
+                int sum = 0;
+                switch(c) {
+                        case 0x1:
+                        case 0x2: case 0x4: case 0x8:
+                                sum +=1; break;
+                        case 0x3: case 0x5: case 0x6: case 0x9:
+                        case 10: case 12:
+                                sum +=2; break;
+                        case 0x7: case 14: case 13: case 11:
+                                sum += 3; break;
+                        case 15:
+                                sum +=4; break;
+                        }
+                return sum;
+        }
+
+static int score(HashWordListTuple& s1, HashWordListTuple& s2) {
+                unsigned char result[20];
+                int sum = 0;
+                for(int i=0;i<20;i++ ) {
+                        result[i] = s1.sha1[i] ^ s2.sha1[i];
+                        unsigned char part1 = result[i] >> 4;
+                        unsigned char part2 = (unsigned char)(result[i] & 0x0f);
+                        sum += __score(part1);
+                        sum += __score(part2);
+                }
+                return sum;
+        }
+
+
+
+
+
 int main(int argc, char* argv[]) {
 
 	string target_filename;
@@ -139,10 +174,14 @@ int main(int argc, char* argv[]) {
 	Words words;
 	words.init("words");
 
+	HashWordListTuple target = words.choose();
+
 	for(int i=0;i<1000000;i++) {
-		//HashWordListTuple ht =words.choose();
-		//cout << ht << endl;
-		string s = words.make_target_string();
+		HashWordListTuple ht =words.choose();
+		int scr = score(target,ht);
+		if (scr<45) {
+			cout << scr << endl;
+		}
 	}
 
 	return 0;
