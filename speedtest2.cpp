@@ -15,12 +15,15 @@ uses a more c like structure
 
 using namespace std;
 
+const int TOTAL_WORDS = 1000;
+typedef char* PCHAR;
+static PCHAR words[TOTAL_WORDS]; // compilatio unit scope
+static PCHAR words_space[TOTAL_WORDS];
+
 const int WORD_COUNT = 12;
 int THRESHOLD = 50; // score threshold
 int SIM_COUNT = 10000000;
-
-typedef vector<string> VS;
-typedef vector<int> VI;
+const int SHA_SIZE = 20;
 
 int make_rand() {
 	return abs(rand()) % 1000;
@@ -38,11 +41,17 @@ struct WordIndexList {
 
 struct HashWordListTuple {
 	WordIndexList wl;
-	unsigned char sha1[20];
+	unsigned char sha1[SHA_SIZE];
 };
 
 ostream& operator<<(ostream& os, HashWordListTuple& src) {
-	for(int i=0;i<20;i++) {
+	for(int i=0;i<WORD_COUNT;i++) {
+		int idx = src.wl.wl[i];
+		if (i==WORD_COUNT-1) os << words[idx];
+		else os << words_space[idx];
+	}
+	os << ": ";
+	for(int i=0;i<SHA_SIZE;i++) {
 		char buffer[10];
 		sprintf(buffer, "%02x", src.sha1[i]);
 		os << buffer;
@@ -51,32 +60,28 @@ ostream& operator<<(ostream& os, HashWordListTuple& src) {
 }
 
 struct Words {
-	VS words;
+
 	void init(string words_filename) {
-		words = load_file(words_filename);
+		load_file(words_filename);
 	}
-	int size() {
-		return words.size();
-	}
-	VS load_file(string words_filename) {
+	void load_file(string words_filename) {
 		ifstream inf;
-		//inf.open("./words");
 		inf.open(words_filename.c_str());
 		if (!inf) {
 			cout << "unable to open word list" << endl;
 			exit(1);
 		}
 		string buffer;
-		VS result;
+		int index= 0;
 		while(inf >> buffer) {
-			result.push_back(buffer);
+			words[index] = new char[buffer.size()+1];
+			strcpy(words[index],buffer.c_str());
+			words_space[index] = new char[buffer.size()+2];
+			strcpy(words_space[index], words[index]);
+			strcat(words_space[index], " ");
+			index++;
 		}
 		inf.close();
-		return result;
-	}
-
-	string get_random_word() {
-		return words[make_rand()];
 	}
 
 	HashWordListTuple choose() {
@@ -86,41 +91,19 @@ struct Words {
 		sha1_context ctx;
 		sha1_starts(&ctx);
 		for(int i=0;i<WORD_COUNT;i++) {
-			const char * cp = words[ht.wl.wl[i]].c_str(); // not safe really
-			sha1_update(&ctx,(unsigned char*)cp,strlen(cp));
-			if (i!=WORD_COUNT-1) { 
-				sha1_update(&ctx, (unsigned char*)SPACE,1);
+			if (i==WORD_COUNT-1) {
+				const char * cp = words_space[ht.wl.wl[i]]; 
+				sha1_update(&ctx,(unsigned char*)cp,strlen(cp));
+			} else {
+				const char * cp = words[ht.wl.wl[i]];
+				sha1_update(&ctx,(unsigned char*)cp,strlen(cp));
 			}
 		}
 		sha1_finish(&ctx,ht.sha1);
 		return ht;
 	}
 
-	string make_target_string() {
-		string ts;
-		for(int i=0;i<WORD_COUNT;i++) {
-			ts += get_random_word();
-			if (i==WORD_COUNT-1) {
-				// do nothing
-			} else {
-				ts += " ";
-			}	
-		}
-		return ts;
-	}
-	string get(int index) {
-		return words[index];
-	}
 };
-
-ostream& operator<<(ostream& os, VS& vs) {
-	VS::iterator ip = vs.begin();
-	while(ip!=vs.end()) {
-		os << *ip++ << " ";
-	}
-	return os;
-}
-
 
 void init() {
 	srand(time(0));
@@ -145,9 +128,9 @@ static int __score(unsigned char c) {
         }
 
 static int score(HashWordListTuple& s1, HashWordListTuple& s2) {
-                unsigned char result[20];
+                unsigned char result[SHA_SIZE];
                 int sum = 0;
-                for(int i=0;i<20;i++ ) {
+                for(int i=0;i<SHA_SIZE;i++ ) {
                         result[i] = s1.sha1[i] ^ s2.sha1[i];
                         unsigned char part1 = result[i] >> 4;
                         unsigned char part2 = (unsigned char)(result[i] & 0x0f);
@@ -190,6 +173,8 @@ int main(int argc, char* argv[]) {
 
 	for(int i=0;i<SIM_COUNT;i++) {
 		HashWordListTuple ht =words.choose();
+		//cout << ht << endl;
+
 		int scr = score(target_tuple,ht);
 		if (scr<THRESHOLD) {
 			cout << scr << endl;
