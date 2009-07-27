@@ -19,6 +19,8 @@ const int TOTAL_WORDS = 1000;
 typedef char* PCHAR;
 static PCHAR words[TOTAL_WORDS]; // compilatio unit scope
 static PCHAR words_space[TOTAL_WORDS];
+static int words_len[TOTAL_WORDS];
+static int words_space_len[TOTAL_WORDS];
 
 const int WORD_COUNT = 12;
 int THRESHOLD = 50; // score threshold
@@ -79,6 +81,10 @@ struct Words {
 			words_space[index] = new char[buffer.size()+2];
 			strcpy(words_space[index], words[index]);
 			strcat(words_space[index], " ");
+
+			words_len[index] = strlen(words[index]);
+			words_space_len[index] = strlen(words_space[index]);
+
 			index++;
 		}
 		inf.close();
@@ -91,12 +97,13 @@ struct Words {
 		sha1_context ctx;
 		sha1_starts(&ctx);
 		for(int i=0;i<WORD_COUNT;i++) {
+			int fix = ht.wl.wl[i];
 			if (i==WORD_COUNT-1) {
-				const char * cp = words_space[ht.wl.wl[i]]; 
-				sha1_update(&ctx,(unsigned char*)cp,strlen(cp));
+				const char * cp = words_space[fix]; 
+				sha1_update(&ctx,(unsigned char*)cp,words_space_len[fix]);
 			} else {
 				const char * cp = words[ht.wl.wl[i]];
-				sha1_update(&ctx,(unsigned char*)cp,strlen(cp));
+				sha1_update(&ctx,(unsigned char*)cp,words_len[fix]);
 			}
 		}
 		sha1_finish(&ctx,ht.sha1);
