@@ -1,8 +1,11 @@
 
-all: tone test_it junk speedtest speedtest1 speedtest2
+all: tone test_it junk speedtest speedtest1 speedtest2 speedtest3
 
 INC=-I polarssl-0.11.1/include
 LIB=-L polarssl-0.11.1/library -lpolarssl
+
+speedtest3 : speedtest3.cpp
+	g++ -g -o speedtest3 speedtest3.cpp ${INC} ${LIB}
 
 speedtest2 : speedtest2.cpp
 	g++ -g -o speedtest2 speedtest2.cpp ${INC} ${LIB}
