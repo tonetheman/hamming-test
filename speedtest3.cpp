@@ -120,26 +120,6 @@ struct Words {
 		sha1_finish(&ctx,ht.sha1);
 	}
 
-	HashWordListTuple choose() {
-		char SPACE[2]; SPACE[0] = ' '; SPACE[1] = 0;
-		HashWordListTuple ht;
-		ht.wl.init(); // this makes a random choice from all words
-		sha1_context ctx;
-		sha1_starts(&ctx);
-		for(int i=0;i<WORD_COUNT;i++) {
-			int fix = ht.wl.wl[i];
-			if (i==WORD_COUNT-1) {
-				const char * cp = words_space[fix]; 
-				sha1_update(&ctx,(unsigned char*)cp,words_space_len[fix]);
-			} else {
-				const char * cp = words[ht.wl.wl[i]];
-				sha1_update(&ctx,(unsigned char*)cp,words_len[fix]);
-			}
-		}
-		sha1_finish(&ctx,ht.sha1);
-		return ht;
-	}
-
 };
 
 void init() {
@@ -174,6 +154,12 @@ static int score(HashWordListTuple& s2) {
                         unsigned char part2 = (unsigned char)(result[i] & 0x0f);
                         sum += __score(part1);
                         sum += __score(part2);
+
+			// if at any point you are above the 
+			// threshold you can quit
+			if (sum>THRESHOLD) {
+				return sum;
+			}
                 }
                 return sum;
         }
