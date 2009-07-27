@@ -103,7 +103,7 @@ struct Words {
 				const char * cp = words_space[fix]; 
 				sha1_update(&ctx,(unsigned char*)cp,words_space_len[fix]);
 			} else {
-				const char * cp = words[ht.wl.wl[i]];
+				const char * cp = words[fix];
 				sha1_update(&ctx,(unsigned char*)cp,words_len[fix]);
 			}
 		}
