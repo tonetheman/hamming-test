@@ -46,6 +46,9 @@ struct HashWordListTuple {
 	unsigned char sha1[SHA_SIZE];
 };
 
+// GLOBAL target value, filled out in main
+static HashWordListTuple target_tuple;
+
 ostream& operator<<(ostream& os, HashWordListTuple& src) {
 	for(int i=0;i<WORD_COUNT;i++) {
 		int idx = src.wl.wl[i];
@@ -151,11 +154,11 @@ static int __score(unsigned char c) {
                 return sum;
         }
 
-static int score(HashWordListTuple& s1, HashWordListTuple& s2) {
+static int score(HashWordListTuple& s2) {
                 unsigned char result[SHA_SIZE];
                 int sum = 0;
                 for(int i=0;i<SHA_SIZE;i++ ) {
-                        result[i] = s1.sha1[i] ^ s2.sha1[i];
+                        result[i] = target_tuple.sha1[i] ^ s2.sha1[i];
                         unsigned char part1 = result[i] >> 4;
                         unsigned char part2 = (unsigned char)(result[i] & 0x0f);
                         sum += __score(part1);
@@ -186,12 +189,12 @@ int main(int argc, char* argv[]) {
 	Words words;
 	words.init("words");
 
+	// fill out global target
 	const char * real_target =  "I would much rather hear more about your whittling project";
         sha1_context target_ctx;
         sha1_starts(&target_ctx);
 	sha1_update(&target_ctx,(unsigned char*)
 		real_target,strlen(real_target));
-	HashWordListTuple target_tuple;
 	sha1_finish(&target_ctx, target_tuple.sha1);
 
 
@@ -199,7 +202,7 @@ int main(int argc, char* argv[]) {
 	for(int i=0;i<SIM_COUNT;i++) {
 		words.choose(ht);
 		//cout << ht << endl;
-		int scr = score(target_tuple,ht);
+		int scr = score(ht);
 		if (scr<THRESHOLD) {
 			cout << scr << endl;
 		}
