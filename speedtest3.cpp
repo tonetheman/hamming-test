@@ -34,7 +34,11 @@ int make_rand() {
 struct WordIndexList {
 	int wl[WORD_COUNT];
 	void init() {
-		for(int i=0;i<WORD_COUNT;i++) wl[i] = make_rand();
+		// unrolled loop
+		wl[0] = make_rand(); wl[1] = make_rand(); wl[2] = make_rand();
+		wl[3] = make_rand(); wl[4] = make_rand(); wl[5] = make_rand();
+		wl[6] = make_rand(); wl[7] = make_rand(); wl[8] = make_rand();
+		wl[9] = make_rand(); wl[10] = make_rand(); wl[11] = make_rand();
 	}
 	void copy(WordIndexList& src) {
 		for(int i=0;i<WORD_COUNT;i++) wl[i] = src.wl[i];
