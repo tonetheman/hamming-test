@@ -40,9 +40,6 @@ struct WordIndexList {
 		wl[6] = make_rand(); wl[7] = make_rand(); wl[8] = make_rand();
 		wl[9] = make_rand(); wl[10] = make_rand(); wl[11] = make_rand();
 	}
-	void copy(WordIndexList& src) {
-		for(int i=0;i<WORD_COUNT;i++) wl[i] = src.wl[i];
-	}
 };
 
 struct HashWordListTuple {
@@ -206,7 +203,6 @@ int main(int argc, char* argv[]) {
 	HashWordListTuple ht;
 	for(int i=0;i<SIM_COUNT;i++) {
 		words.choose(ht);
-		//cout << ht << endl;
 		int scr = score(ht);
 		if (scr<THRESHOLD) {
 			cout << scr << endl;
