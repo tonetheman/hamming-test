@@ -11,8 +11,8 @@
 using namespace std;
 
 const int WORD_COUNT = 12;
-const int POPULATION_SIZE = 3;
-const int CUTOFF = 1000000;
+int THRESHOLD = 50; // score threshold
+int SIM_COUNT = 10000000;
 
 typedef vector<string> VS;
 typedef vector<int> VI;
@@ -174,12 +174,18 @@ int main(int argc, char* argv[]) {
 	Words words;
 	words.init("words");
 
-	HashWordListTuple target = words.choose();
-	int THRESHOLD = 50;
+	const char * real_target =  "I would much rather hear more about your whittling project";
+        sha1_context target_ctx;
+        sha1_starts(&target_ctx);
+	sha1_update(&target_ctx,(unsigned char*)
+		real_target,strlen(real_target));
+	HashWordListTuple target_tuple;
+	sha1_finish(&target_ctx, target_tuple.sha1);
 
-	for(int i=0;i<10000000;i++) {
+
+	for(int i=0;i<SIM_COUNT;i++) {
 		HashWordListTuple ht =words.choose();
-		int scr = score(target,ht);
+		int scr = score(target_tuple,ht);
 		if (scr<THRESHOLD) {
 			cout << scr << endl;
 		}
