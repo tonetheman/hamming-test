@@ -200,7 +200,9 @@ int main(int argc, char* argv[]) {
 		words.choose(ht);
 		int scr = score(ht);
 		if (scr<THRESHOLD) {
-			cout << scr << endl;
+			cout << scr << " ";
+			cout << ht << endl;
+			
 			THRESHOLD = scr;
 		}
 	}
