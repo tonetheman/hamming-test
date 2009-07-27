@@ -157,7 +157,7 @@ static int score(HashWordListTuple& s2) {
 
 			// if at any point you are above the 
 			// threshold you can quit
-			if (sum>THRESHOLD) {
+			if (sum>THRESHOLD-1) {
 				return sum;
 			}
                 }
@@ -201,6 +201,7 @@ int main(int argc, char* argv[]) {
 		int scr = score(ht);
 		if (scr<THRESHOLD) {
 			cout << scr << endl;
+			THRESHOLD = scr;
 		}
 	}
 
