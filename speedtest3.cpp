@@ -144,12 +144,13 @@ void init() {
 static int __score(unsigned char c) {
                 int sum = 0;
                 switch(c) {
-                        case 0x1:
-                        case 0x2: case 0x4: case 0x8:
-                                sum +=1; break;
+
                         case 0x3: case 0x5: case 0x6: case 0x9:
                         case 10: case 12:
                                 sum +=2; break;
+                        case 0x1:
+                        case 0x2: case 0x4: case 0x8:
+                                sum +=1; break;
                         case 0x7: case 14: case 13: case 11:
                                 sum += 3; break;
                         case 15:
