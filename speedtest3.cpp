@@ -28,7 +28,7 @@ int SIM_COUNT = 10000000;
 const int SHA_SIZE = 20;
 
 int make_rand() {
-	return abs(rand()) % 1000;
+	return rand() % 1000;
 }
 
 struct WordIndexList {
