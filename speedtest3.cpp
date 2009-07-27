@@ -30,15 +30,24 @@ const int SHA_SIZE = 20;
 int make_rand() {
 	return rand() % 1000;
 }
+#define MAKE_RAND (rand()%1000)
 
 struct WordIndexList {
 	int wl[WORD_COUNT];
 	void init() {
 		// unrolled loop
+#if 0
 		wl[0] = make_rand(); wl[1] = make_rand(); wl[2] = make_rand();
 		wl[3] = make_rand(); wl[4] = make_rand(); wl[5] = make_rand();
 		wl[6] = make_rand(); wl[7] = make_rand(); wl[8] = make_rand();
 		wl[9] = make_rand(); wl[10] = make_rand(); wl[11] = make_rand();
+#else
+		wl[0] = MAKE_RAND; wl[1] = MAKE_RAND; wl[2] = MAKE_RAND;
+		wl[3] = MAKE_RAND; wl[4] = MAKE_RAND; wl[5] = MAKE_RAND;
+		wl[6] = MAKE_RAND; wl[7] = MAKE_RAND; wl[8] = MAKE_RAND;
+		wl[9] = MAKE_RAND; wl[10] = MAKE_RAND; wl[11] = MAKE_RAND;
+	
+#endif
 	}
 };
 
