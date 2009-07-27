@@ -90,6 +90,23 @@ struct Words {
 		inf.close();
 	}
 
+	void choose(HashWordListTuple& ht) {
+		ht.wl.init();
+		sha1_context ctx;
+		sha1_starts(&ctx);
+		for(int i=0;i<WORD_COUNT;i++) {
+			int fix = ht.wl.wl[i];
+			if (i==WORD_COUNT-1) {
+				const char * cp = words_space[fix]; 
+				sha1_update(&ctx,(unsigned char*)cp,words_space_len[fix]);
+			} else {
+				const char * cp = words[ht.wl.wl[i]];
+				sha1_update(&ctx,(unsigned char*)cp,words_len[fix]);
+			}
+		}
+		sha1_finish(&ctx,ht.sha1);
+	}
+
 	HashWordListTuple choose() {
 		char SPACE[2]; SPACE[0] = ' '; SPACE[1] = 0;
 		HashWordListTuple ht;
@@ -178,10 +195,10 @@ int main(int argc, char* argv[]) {
 	sha1_finish(&target_ctx, target_tuple.sha1);
 
 
+	HashWordListTuple ht;
 	for(int i=0;i<SIM_COUNT;i++) {
-		HashWordListTuple ht =words.choose();
+		words.choose(ht);
 		//cout << ht << endl;
-
 		int scr = score(target_tuple,ht);
 		if (scr<THRESHOLD) {
 			cout << scr << endl;
